@@ -35,7 +35,7 @@ MongoClient.connect(url, (err, client) => {
 
   // findOneAndDelete
   var query = {
-    _id : new ObjectId("5ab69f5347a2d90ab80eb0f0")
+    _id : new ObjectId("5aca6f846c0d34169c7d9c6b")
   }
   db.collection(collection).findOneAndDelete(query).then((result) => {
     console.log(result)

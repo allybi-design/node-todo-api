@@ -5,17 +5,24 @@ const {ObjectID} = require('mongodb')
 const {app} = require('./../server')
 const {Todo} = require('./../models/todo')
 
-const todos = [{
+const dummyTodos = [{
   _id: new ObjectID(),
   text: 'First test todo'
 }, {
   _id: new ObjectID(),
   text: 'Second test todo'
-}]
+},{
+  _id: new ObjectID(),
+  text: 'Third test todo'
+},{
+  _id: new ObjectID(),
+  text: 'Fourth test todo'
+}
+]
 
 beforeEach((done) => {
   Todo.remove({}).then(() => {
-    return Todo.insertMany(todos)
+    return Todo.insertMany(dummyTodos)
   }).then(() => done())
 })
 
@@ -54,7 +61,7 @@ describe('POST /todos', () => {
         }
 
         Todo.find().then((todos) => {
-          expect(todos.length).toBe(2)
+          expect(todos.length).toBe(dummyTodos.length)
           done()
         }).catch((e) => done(e))
       })
@@ -67,7 +74,7 @@ describe('GET /todos', () => {
       .get('/todos')
       .expect(200)
       .expect((res) => {
-        expect(res.body.todos.length).toBe(2)
+        expect(res.body.todos.length).toBe(dummyTodos.length)
       })
       .end(done)
   })
@@ -76,10 +83,10 @@ describe('GET /todos', () => {
 describe('GET /todos/:id', () => {
   it('should return todo doc', (done) => {
     request(app)
-      .get(`/todos/${todos[0]._id.toHexString()}`)
+      .get(`/todos/${dummyTodos[0]._id.toHexString()}`)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todo.text).toBe(todos[0].text)
+        expect(res.body.todo.text).toBe(dummyTodos[0].text)
       })
       .end(done)
   })
@@ -100,3 +107,42 @@ describe('GET /todos/:id', () => {
       .end(done)
   })
 })
+
+//DELETE method test
+describe('Delete /todos/:id', () => {
+  it('should DELETE/:id todo doc', (done) => {
+    request(app)
+      .delete(`/todos/${dummyTodos[2]._id.toHexString()}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(dummyTodos[2].text)
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err)
+        }
+
+        Todo.findById(dummyTodos[2]._id.toHexString()).then((todo) => {
+          expect(todo).toBeFalsy()
+          done()
+        }).catch((e) => done(e))
+      })
+  })
+
+  it('should return 404 if todo not found', (done) => {
+    var hexId = new ObjectID().toHexString()
+
+    request(app)
+      .delete(`/todos/${hexId}`)
+      .expect(404)
+      .end(done)
+  })
+
+  it('should return 404 for invalide ids', (done) => {
+    request(app)
+      .delete('/todos/123abc')
+      .expect(404)
+      .end(done)
+  })
+})
+
