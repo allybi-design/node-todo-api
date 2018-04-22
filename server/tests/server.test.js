@@ -7,16 +7,24 @@ const {Todo} = require('./../models/todo')
 
 const dummyTodos = [{
   _id: new ObjectID(),
-  text: 'First test todo'
+  text: 'First test todo',
+  completed: false,
+  completedAt: null
 }, {
   _id: new ObjectID(),
-  text: 'Second test todo'
+  text: 'Second test todo',
+  completed: true,
+  completedAt: 333
 },{
   _id: new ObjectID(),
-  text: 'Third test todo'
+  text: 'Third test todo',
+  completed: false,
+  completedAt: null
 },{
   _id: new ObjectID(),
-  text: 'Fourth test todo'
+  text: 'Fourth test todo',
+  completed: false,
+  completedAt: null
 }
 ]
 
@@ -146,3 +154,41 @@ describe('Delete /todos/:id', () => {
   })
 })
 
+
+//PATCH method test
+describe('PATCH /todos/:id', () => {
+  it('should change completed to \"true\" on 1st record', (done) => {
+    var hexId = dummyTodos[0]._id.toHexString()
+    var text = "The first value changed to complete"
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+          text,
+          completedAt: new Date().getTime(),
+          completed: true
+        })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.completed).toBe(true)
+        expect(res.body.todo.text).toBe(text)
+      })
+      .end(done)
+  })
+
+  it('should change completed to \"false\" on 2st record', (done) => {
+    var hexId = dummyTodos[1]._id.toHexString()
+    var text = "The second value changed to NOT complete"
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+          text,
+          completedAt: null,
+          completed: false
+        })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.completed).toBe(false)
+      })
+      .end(done)
+  })
+})
