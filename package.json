@@ -6,7 +6,7 @@
   "scripts": {
     "mongo-start": "mongod.exe --dbpath /users/aliso/mongo-data",
     "start": "node server/server.js",
-    "test": "SET \"NODE_ENV = test \" && mocha server/**/*.test.js --timeout 5000",
+    "test": "SET \"NODE_ENV = test \" && mocha server/**/*.test.js --timeout 5000 --full-trace",
     "test-watch": "nodemon --exec \"npm test\"",
     "another-ex": "a text node exe"
   },
@@ -25,8 +25,8 @@
   },
   "devDependencies": {
     "expect": "^22.4.3",
-    "mocha": "^5.0.5",
-    "supertest": "^3.0.0",
-    "nodemon": "1.17.3"
+    "mocha": "^5.1.1",
+    "nodemon": "1.17.3",
+    "supertest": "^3.0.0"
   }
 }

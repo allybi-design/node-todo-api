@@ -28,31 +28,39 @@ const dummyTodos = [{
 }
 ]
 
-beforeEach((done) => {
-  Todo.remove({}).then(() => {
-    return Todo.insertMany(dummyTodos)
-  }).then(() => done())
+Todo.remove({}).then(() => {
+  return Todo.insertMany(dummyTodos)
 })
+
+// beforeEach(() => {
+//   Todo.remove({}).then(() => {
+//     return Todo.insertMany(dummyTodos)
+//   }).then(() => done())
+// })
 
 describe('POST /todos', () => {
   it('should create a new todo', (done) => {
-    var text = 'Test todo text'
+    var newTodo = {
+      text: 'A NEW Test todo text',
+      compleated: false,
+      compleatedAt: null
+      }
 
     request(app)
       .post('/todos')
-      .send({text})
+      .send(newTodo)
       .expect(200)
       .expect((res) => {
-        expect(res.body.text).toBe(text)
+        expect(res.body.text).toBe(newTodo.text)
       })
       .end((err, res) => {
         if (err) {
           return done(err)
         }
-
+        var text = newTodo.text
         Todo.find({text}).then((todos) => {
           expect(todos.length).toBe(1)
-          expect(todos[0].text).toBe(text)
+          expect(todos[0].text).toBe(newTodo.text)
           done()
         }).catch((e) => done(e))
       })
@@ -69,7 +77,7 @@ describe('POST /todos', () => {
         }
 
         Todo.find().then((todos) => {
-          expect(todos.length).toBe(dummyTodos.length)
+          expect(todos.length).toBe(dummyTodos.length+1)
           done()
         }).catch((e) => done(e))
       })
@@ -82,7 +90,7 @@ describe('GET /todos', () => {
       .get('/todos')
       .expect(200)
       .expect((res) => {
-        expect(res.body.todos.length).toBe(dummyTodos.length)
+        expect(res.body.todos.length).toBe(dummyTodos.length+1)
       })
       .end(done)
   })
@@ -120,17 +128,17 @@ describe('GET /todos/:id', () => {
 describe('Delete /todos/:id', () => {
   it('should DELETE/:id todo doc', (done) => {
     request(app)
-      .delete(`/todos/${dummyTodos[2]._id.toHexString()}`)
+      .delete(`/todos/${dummyTodos[3]._id.toHexString()}`)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todo.text).toBe(dummyTodos[2].text)
+        expect(res.body.todo.text).toBe(dummyTodos[3].text)
       })
       .end((err, res) => {
         if (err) {
           return done(err)
         }
 
-        Todo.findById(dummyTodos[2]._id.toHexString()).then((todo) => {
+        Todo.findById(dummyTodos[3]._id.toHexString()).then((todo) => {
           expect(todo).toBeFalsy()
           done()
         }).catch((e) => done(e))
@@ -153,7 +161,6 @@ describe('Delete /todos/:id', () => {
       .end(done)
   })
 })
-
 
 //PATCH method test
 describe('PATCH /todos/:id', () => {
