@@ -8,6 +8,7 @@ const { ObjectID } = require("mongodb")
 const { mongoose } = require("./db/mongoose")
 const { Todo } = require("./models/todo")
 const { User } = require("./models/user")
+const { authenticate } = require('./middleware/authenicate')
 
 const app = express()
 const port = process.env.PORT
@@ -116,6 +117,25 @@ app.post("/users", (req, res) => {
     })
 })
 
+// exported to module in ./middleware
+// var authenticate = (req, res, next) => {
+//   var token = req.header('x-auth')
+
+//   User.findByToken(token).then((user) => {
+//     if (!user) {
+//       return Promise.reject('Can\'t find user')
+//     }
+//     req.user = user
+//     req.token = token
+//     next()
+//   }).catch((e) => {
+//     res.status(401).send(e)
+//   })
+// }
+
+app.get('/users/me', authenticate, (req, res) => {
+  res.send(req.user)
+})
 
 app.listen(port, () => {
   console.log(`Started on port ${port}`)
