@@ -1,5 +1,5 @@
-// const {SHA256} = require('crypto-js')
-// const jwt = require('jsonwebtoken')
+const {SHA256} = require('crypto-js')
+const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
 var password = '123abc'
@@ -10,22 +10,26 @@ var password = '123abc'
 //   })
 // })
 
-var hashedpassword = '$2a$10$E4XlyxgsltyYt479nFVrS.MMl6/7OKLfzwM8DPgQPnqhsCcm3x//K'
+// var hashedpassword = '$2a$10$E4XlyxgsltyYt479nFVrS.MMl6/7OKLfzwM8DPgQPnqhsCcm3x//K'
 
-bcrypt.compare(password, hashedpassword, (err, res) => {
-  console.log(res);
-})
+// bcrypt.compare(password, hashedpassword, (err, res) => {
+//   console.log(res);
+// })
 
-// const secret = 'mysecret'
-// var data = {
-//   id: 10
-// }
-
+const secret = 'mysecret'
+var data = {
+  id: 10
+}
+const user = {
+  _id: 6
+}
+var access = 'auth'
 // var token = jwt.sign(data, secret)
-// console.log(token)
+var token = jwt.sign({_id: user._id, access}, 'mysecret').toString()
+console.log(`the tokern is - ${token}`)
 
-// var decoded = jwt.verify(token, secret)
-// console.log(decoded);
+var decoded = jwt.verify(token, secret)
+console.log(decoded);
 
 
 // const message = 'Im user number 3'
@@ -42,8 +46,8 @@ bcrypt.compare(password, hashedpassword, (err, res) => {
 //   hash: SHA256(JSON.stringify(data)+ 'mysecret').toString()
 // }
 
-// token.id = 5
-// token.hash = SHA256(JSON.stringify(token.data)).toString()
+// // token.id = 5
+// // token.hash = SHA256(JSON.stringify(token.data)).toString()
 
 // var resultHash = SHA256(JSON.stringify(token.data)+ 'mysecret').toString()
 // if (resultHash === token.hash) {

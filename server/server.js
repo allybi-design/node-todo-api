@@ -100,38 +100,26 @@ app.patch("/todos/:id", (req, res) => {
       }
       res.status(200).send({todo})
     })
-    .catch(e => {
-      res.status(400).send(e)
-  })
+    .catch(e => res.status(400).send(e))
 })
 
 // PUSH a new USER to DB
 app.post("/users", (req, res) => {
+  // var body = _.pick(req.body, ['email', 'password'])
   var user = new User(_.pick(req.body, ['email', 'password']))
-  user.save().then(() => {
-     return user.generateAuthToken()
-    }).then ((token) => {
-      res.header('x-auth', token).send(user)
-    }).catch(e => {
-      res.status(400).send(e)
+
+  user.save()
+    // .then(() => {
+    //   return user.generateAuthToken()
+    // })
+    .then(doc => {
+      res.send(doc)
     })
-})
-
-// exported to module in ./middleware
-// var authenticate = (req, res, next) => {
-//   var token = req.header('x-auth')
-
-//   User.findByToken(token).then((user) => {
-//     if (!user) {
-//       return Promise.reject('Can\'t find user')
-//     }
-//     req.user = user
-//     req.token = token
-//     next()
-//   }).catch((e) => {
-//     res.status(401).send(e)
-//   })
-// }
+    // .then((token) => {
+    //   res.header('x-auth', token).send(user)
+    // })
+    .catch((e) => res.status(400).send(e))
+  })
 
 app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user)

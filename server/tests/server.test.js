@@ -5,38 +5,10 @@ const {ObjectID} = require('mongodb')
 const {app} = require('./../server')
 const {Todo} = require('./../models/todo')
 
-const dummyTodos = [{
-  _id: new ObjectID(),
-  text: 'First test todo',
-  completed: false,
-  completedAt: null
-}, {
-  _id: new ObjectID(),
-  text: 'Second test todo',
-  completed: true,
-  completedAt: 333
-},{
-  _id: new ObjectID(),
-  text: 'Third test todo',
-  completed: false,
-  completedAt: null
-},{
-  _id: new ObjectID(),
-  text: 'Fourth test todo',
-  completed: false,
-  completedAt: null
-}
-]
+const {dummyTodos, users, populateTodos, populateUsers} = require('./seed/seed')
 
-Todo.remove({}).then(() => {
-  return Todo.insertMany(dummyTodos)
-})
-
-// beforeEach(() => {
-//   Todo.remove({}).then(() => {
-//     return Todo.insertMany(dummyTodos)
-//   }).then(() => done())
-// })
+beforeEach(populateUsers)
+beforeEach(populateTodos)
 
 describe('POST /todos', () => {
   it('should create a new todo', (done) => {
@@ -75,9 +47,8 @@ describe('POST /todos', () => {
         if (err) {
           return done(err)
         }
-
         Todo.find().then((todos) => {
-          expect(todos.length).toBe(dummyTodos.length+1)
+          expect(todos.length).toBe(dummyTodos.length)
           done()
         }).catch((e) => done(e))
       })
@@ -90,7 +61,7 @@ describe('GET /todos', () => {
       .get('/todos')
       .expect(200)
       .expect((res) => {
-        expect(res.body.todos.length).toBe(dummyTodos.length+1)
+        expect(res.body.todos.length).toBe(dummyTodos.length)
       })
       .end(done)
   })
@@ -162,7 +133,7 @@ describe('Delete /todos/:id', () => {
   })
 })
 
-//PATCH method test
+// PATCH method test
 describe('PATCH /todos/:id', () => {
   it('should change completed to \"true\" on 1st record', (done) => {
     var hexId = dummyTodos[0]._id.toHexString()

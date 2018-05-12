@@ -26,8 +26,8 @@ const UserSchema = new mongoose.Schema({
       type: String,
       required: true
     },
-    token:{
-       type: String,
+    token: {
+      type: String,
       required: true
     }
   }]
@@ -48,8 +48,8 @@ UserSchema.methods.toJSON = function () {
 UserSchema.methods.generateAuthToken = function () {
   var user = this
   var access = 'auth'
-  var token = jwt.sign({_id: user._id.toHexString(), access}, 'mysecret').toString()
-
+  var token = jwt.sign({_id: user._id, access}, 'mysecret').toString()
+  
   user.tokens = user.tokens.concat([{access, token}])
 
   return user.save().then(() => {
@@ -58,25 +58,28 @@ UserSchema.methods.generateAuthToken = function () {
 }
 
 UserSchema.statics.findByToken = function (token) {
-  var User = this
+  var User = this;
   var decoded
 
   try {
     decoded = jwt.verify(token, 'mysecret')
   } catch (e) {
-      return Promise.reject('NOT Authenticated')
-    }
-    return User.findOne({
-      '_id': decoded._id,
-      'tokens.token': token,
-      'tokens.access': 'auth'
-    })
+      return Promise.reject()
   }
+  
+  return User.findOne({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  })
+}
 
 UserSchema.pre('save', function(next) {
-  if (user.isModified('password')) {
+  var user = this;
+
+  if (User.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(this.user.password, salt, (err, hash) => {
+      bcrypt.hash(user.password, salt, (err, hash) => {
       user.password = hash
       next()
       })
