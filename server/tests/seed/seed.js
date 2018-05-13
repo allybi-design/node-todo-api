@@ -27,28 +27,23 @@ const dummyTodos = [{
 
 const userOneId = new ObjectID()
 const userTwoId = new ObjectID()
-const users = [
+
+const user = [
   {
     _id: userOneId,
-    email: 'me@here.com',
-    password: '123abc',
+    email: 'user1@here.com',
+    password: 'mysecret',
     tokens: {
       access: 'auth',
-      token: jwt.sign({_id: userOneId, access: 'auth'}, '123abc').toString()
+      token: jwt.sign({_id: userOneId, access: 'auth'}, 'abc123').toString()
     }
   },
   {
     _id: userTwoId,
-    email: 'himToo@there.co.uk',
-    password: 'abc123',
-    tokens: {
-      access: 'auth',
-      token: jwt.sign({_id: userTwoId, access: 'auth'}, '123abc').toString()
-    }
+    email: 'user2@there.co.uk',
+    password: 'abc123'
   }
 ]
-console.log(users[0])
-console.log(users[1])
 
 const populateTodos = ((done) => {
   Todo.remove().then(() => {
@@ -56,11 +51,10 @@ const populateTodos = ((done) => {
     }).then(() => done())
 })
 
-
 const populateUsers = ((done) => {
-  User.remove({}).then(() => {
-    var userOne = new User(users[0]).save()
-    var userTwo = new User(users[1]).save()
+  User.remove().then(() => {
+    var userOne = new User(user[0]).save()
+    var userTwo = new User(user[1]).save()
     return Promise.all([userOne, userTwo])
   }).then(() => done())
 })
@@ -69,5 +63,5 @@ module.exports = {
   populateTodos,
   populateUsers,
   dummyTodos,
-  users
+  user
 }

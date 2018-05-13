@@ -40,7 +40,7 @@ const UserSchema = new mongoose.Schema({
 //   return _.pick(userObject, ['_id', 'email'])
 // }
 
-//as above BUT condenced
+// as above BUT condenced
 UserSchema.methods.toJSON = function () {
   return _.pick(this.toObject(), ['_id', 'email'])
 }
@@ -48,9 +48,9 @@ UserSchema.methods.toJSON = function () {
 UserSchema.methods.generateAuthToken = function () {
   var user = this
   var access = 'auth'
-  var token = jwt.sign({_id: user._id, access}, 'mysecret').toString()
+  var token = jwt.sign({_id: user._id, access}, 'abc123').toString()
   
-  user.tokens = user.tokens.concat([{access, token}])
+  user.tokens = [{access, token}]
 
   return user.save().then(() => {
     return token
@@ -58,16 +58,15 @@ UserSchema.methods.generateAuthToken = function () {
 }
 
 UserSchema.statics.findByToken = function (token) {
-  var User = this;
-  var decoded
+  var decoded = null
 
   try {
-    decoded = jwt.verify(token, 'mysecret')
+    decoded = jwt.verify(token, 'abc123')
   } catch (e) {
       return Promise.reject()
   }
   
-  return User.findOne({
+  return this.findOne({
     '_id': decoded._id,
     'tokens.token': token,
     'tokens.access': 'auth'
@@ -75,12 +74,10 @@ UserSchema.statics.findByToken = function (token) {
 }
 
 UserSchema.pre('save', function(next) {
-  var user = this;
-
-  if (User.isModified('password')) {
+  if (this.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(user.password, salt, (err, hash) => {
-      user.password = hash
+      bcrypt.hash(this.password, salt, (err, hash) => {
+      this.password = hash
       next()
       })
     })
