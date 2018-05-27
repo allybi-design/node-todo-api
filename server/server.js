@@ -3,6 +3,7 @@ require('./config/config')
 const express = require("express")
 const _ = require("lodash")
 const bodyParser = require("body-parser")
+const cors = require('cors')
 
 const { ObjectID } = require("mongodb")
 const { mongoose } = require("./db/mongoose")
@@ -11,6 +12,7 @@ const { User } = require("./models/user")
 const { authenticate } = require('./middleware/authenicate')
 
 const app = express()
+app.use(cors())
 const port = process.env.PORT
 
 app.use(bodyParser.json())
@@ -132,7 +134,14 @@ app.post('/users/login', (req, res) => {
   }).catch((e)=> {
     res.status(400).send()
   })
+})
 
+app.delete('/users/me/token', authenticate, (req, res) => {
+  req.user.removeToken(req.token).then(() => {
+    res.status(200).send()
+  }, () => {
+    res.status(400).send()
+  })
 })
 
 app.listen(port, () => {
