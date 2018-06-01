@@ -50,7 +50,8 @@ UserSchema.methods.generateAuthToken = function () {
   var access = 'auth'
   var token = jwt.sign({_id: user._id, access}, 'abc123').toString()
   
-  user.tokens = [{access, token}]
+  // user.tokens = [{access, token}]
+  user.tokens.push({access, token}) //might mave trouble with .push
 
   return user.save().then(() => {
     return token
@@ -85,7 +86,7 @@ UserSchema.statics.findByCredentials = function (email, password) {
 }
 
 UserSchema.statics.findByToken = function (token) {
-  var decoded = null
+  var decoded
 
   try {
     decoded = jwt.verify(token, 'abc123')

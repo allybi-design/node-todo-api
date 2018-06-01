@@ -6,8 +6,8 @@
   "scripts": {
     "mongo-start": "mongod.exe --dbpath /users/aliso/mongo-data",
     "start": "node server/server.js",
-    "test": "SET \"NODE_ENV=test\" && mocha server/**/*.test.js --timeout 15000 --full-trace",
-    "test-watch": "nodemon --exec \"npm test\""
+    "test": "SET \"NODE_ENV=test\" && mocha server/**/*.test.js --timeout 5000 --full-trace",
+    "test-watch": "nodemon --exec \"npm test\"  "
   },
   "engines": {
     "node": "9.6.1"
